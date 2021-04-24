@@ -62,7 +62,7 @@ class _HomePageState extends State<HomePage>{
 
                   ElevatedButton(onPressed: (){
                     setState((){
-                      operaciones += "/";
+                      operaciones += " / ";
                     });
                   },child: Text("/"),),
                 ]
@@ -90,7 +90,7 @@ class _HomePageState extends State<HomePage>{
 
                   ElevatedButton(onPressed: (){
                     setState((){
-                      operaciones += "x";
+                      operaciones += " x ";
                     });
                   },child: Text("x"),),
                 ]
@@ -117,7 +117,7 @@ class _HomePageState extends State<HomePage>{
                   },child: Text("3"),),
                   ElevatedButton(onPressed: (){
                     setState((){
-                      operaciones += "-";
+                      operaciones += " - ";
                     });
                   },child: Text("-"),),
                 ]
@@ -137,10 +137,35 @@ class _HomePageState extends State<HomePage>{
                   },child: Text("C"),),
                   ElevatedButton(onPressed: (){
                     setState((){
-                      //operaciones="="
+                      print(operaciones);
+                      int res=0;
+                      
+                      var pila = operaciones.split(" ");
+
+                      if(pila[1].trim() == "+"){
+                        res = int.parse(pila[0]) + int.parse(pila[2]);
+
+                      }
+
+                      else if(pila[1].trim() == "-"){
+                        res = int.parse(pila[0]) + int.parse(pila[2]);
+                      }
+
+                      else if(pila[1].trim() == "*"){
+                        res = int.parse(pila[0]) + int.parse(pila[2]);
+                      }
+
+                      else if(pila[1].trim() == "/"){
+                        res = int.parse(pila[0]) + int.parse(pila[2]);
+                      }
+                      print(res);
                     });
                   },child: Text("="),),
-                  ElevatedButton(onPressed: (){},child: Text("+"),),
+                  ElevatedButton(onPressed: (){
+                    setState((){
+                      operaciones+=" + ";
+                    });
+                  },child: Text("+"),),
                 ]
               )
             ],
