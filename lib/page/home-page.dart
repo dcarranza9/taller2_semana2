@@ -8,7 +8,8 @@ class HomePage extends StatefulWidget{
 
 class _HomePageState extends State<HomePage>{
   String operaciones = "";
-
+  String resultadoOperaciones="";
+  List<Text> listaResultados=[];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,7 +25,19 @@ class _HomePageState extends State<HomePage>{
       children: [
         Expanded(
             child: Container(
-            color:Colors.red,
+            color: Colors.red,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: listaResultados,
+                )
+                ]
+              ),
+            ),
           ),
         ),
         Container(
@@ -133,34 +146,10 @@ class _HomePageState extends State<HomePage>{
                   ElevatedButton(onPressed: (){
                     setState((){
                       operaciones="";
+                      
                     });
                   },child: Text("C"),),
-                  ElevatedButton(onPressed: (){
-                    setState((){
-                      print(operaciones);
-                      int res=0;
-                      
-                      var pila = operaciones.split(" ");
-
-                      if(pila[1].trim() == "+"){
-                        res = int.parse(pila[0]) + int.parse(pila[2]);
-
-                      }
-
-                      else if(pila[1].trim() == "-"){
-                        res = int.parse(pila[0]) + int.parse(pila[2]);
-                      }
-
-                      else if(pila[1].trim() == "*"){
-                        res = int.parse(pila[0]) + int.parse(pila[2]);
-                      }
-
-                      else if(pila[1].trim() == "/"){
-                        res = int.parse(pila[0]) + int.parse(pila[2]);
-                      }
-                      print(res);
-                    });
-                  },child: Text("="),),
+                  ElevatedButton(onPressed: CalcularOperaciones, child: Text("="),),
                   ElevatedButton(onPressed: (){
                     setState((){
                       operaciones+=" + ";
@@ -174,4 +163,37 @@ class _HomePageState extends State<HomePage>{
       ],
     );
  }
+
+   void CalcularOperaciones() {
+     
+     var res = 0.0;                      
+     var pila = operaciones.split(" ");
+     
+     if(pila[1].trim() == "+"){
+       res = double.parse(pila[0]) + double.parse(pila[2]);
+     
+     }
+     
+     else if(pila[1].trim() == "-"){
+       res = double.parse(pila[0]) - double.parse(pila[2]);
+     }
+     
+     else if(pila[1].trim() == "x"){
+       res = double.parse(pila[0]) * double.parse(pila[2]);
+     }
+     
+     else if(pila[1].trim() == "/"){
+       res = double.parse(pila[0]) / double.parse(pila[2]);
+     }
+     
+     setState((){
+       resultadoOperaciones = "$operaciones = $res";
+       listaResultados.add(Text(operaciones));
+       operaciones="$res";
+     });
+
+     //operaciones ="";
+     
+     print("El resultado: $res");
+   }
 }
