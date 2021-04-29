@@ -1,5 +1,7 @@
 
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget{
@@ -7,9 +9,14 @@ class HomePage extends StatefulWidget{
 }
 
 class _HomePageState extends State<HomePage>{
+  
   String operaciones = "";
   String resultadoOperaciones="";
+  String mensaje="";
+  
   List<Text> listaResultados=[];
+  
+  var aux = 0.0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,11 +37,12 @@ class _HomePageState extends State<HomePage>{
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
-                children: [Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: listaResultados,
-                )
+                children: [
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: listaResultados,
+                  )
                 ]
               ),
             ),
@@ -43,11 +51,36 @@ class _HomePageState extends State<HomePage>{
         Container(
           color:Colors.blue,
           height: 100,
-          child: Row(
-            children:[
-              Text(operaciones)
-            ]
-          )
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              //mainAxisAlignment: MainAxisAlignment.end,
+              children:[
+                Expanded(
+                   child: Container(
+                     color: Colors.yellow,
+                     height:50,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Text(operaciones, style: TextStyle(fontSize: 14.0,)),
+                        ),
+                          ],
+                        ),
+                  ),
+                ),
+                Column(
+                  mainAxisAlignment:MainAxisAlignment.end,
+                  children: [
+                    Text("Mensaje de error", style:TextStyle(fontSize: 16.0,),)
+                  ]
+                )
+              ],
+            ),
+          )      
         ),
         Container(
           child: Column(
@@ -75,9 +108,21 @@ class _HomePageState extends State<HomePage>{
 
                   ElevatedButton(onPressed: (){
                     setState((){
-                      operaciones += " / ";
+                      if(operaciones!=""){
+                        operaciones += " / ";
+                      }
+                      
                     });
                   },child: Text("/"),),
+
+                  ElevatedButton(onPressed: (){
+                    setState((){
+                      if(operaciones!=""){
+                        operaciones += " √ ";
+                      }
+                      
+                    });
+                  },child: Text("√"),),
                 ]
               ),
               Row(
@@ -103,9 +148,20 @@ class _HomePageState extends State<HomePage>{
 
                   ElevatedButton(onPressed: (){
                     setState((){
-                      operaciones += " x ";
+                      if(operaciones!=""){
+                        operaciones += " x ";
+                      }
+                      
                     });
                   },child: Text("x"),),
+                  ElevatedButton(onPressed: (){
+                    setState((){
+                      if(operaciones!=""){
+                        operaciones += " % ";
+                      }
+                      
+                    });
+                  },child: Text("%"),),
                 ]
               ),
               Row(
@@ -130,9 +186,13 @@ class _HomePageState extends State<HomePage>{
                   },child: Text("3"),),
                   ElevatedButton(onPressed: (){
                     setState((){
-                      operaciones += " - ";
+                      if(operaciones!=""){
+                        operaciones += " - ";
+                      }
                     });
                   },child: Text("-"),),
+
+                  ElevatedButton(onPressed: (){},child: Text(" "),),
                 ]
               ),
               Row(
@@ -152,9 +212,12 @@ class _HomePageState extends State<HomePage>{
                   ElevatedButton(onPressed: CalcularOperaciones, child: Text("="),),
                   ElevatedButton(onPressed: (){
                     setState((){
-                      operaciones+=" + ";
+                      if(operaciones!=""){
+                        operaciones += " + ";
+                      }
                     });
                   },child: Text("+"),),
+                  ElevatedButton(onPressed: (){},child: Text(" "),),
                 ]
               )
             ],
@@ -166,34 +229,79 @@ class _HomePageState extends State<HomePage>{
 
    void CalcularOperaciones() {
      
-     var res = 0.0;                      
-     var pila = operaciones.split(" ");
-     
-     if(pila[1].trim() == "+"){
-       res = double.parse(pila[0]) + double.parse(pila[2]);
-     
+     var res = 0.0;
+     var malformacion = false;                      
+     var lista = operaciones.split(" ");
+
+     if(operaciones.trim() == ""){
+        return;
      }
      
-     else if(pila[1].trim() == "-"){
-       res = double.parse(pila[0]) - double.parse(pila[2]);
-     }
      
-     else if(pila[1].trim() == "x"){
-       res = double.parse(pila[0]) * double.parse(pila[2]);
+     if(lista.length == 1){
+       
+       if(lista[0] == listaResultados.last.data){
+         return;
+       }
+
+       if(operaciones.trim() == "√"){
+       //Mal formada
+        return;
      }
+
+      setState((){
+        resultadoOperaciones = "$operaciones";
+        listaResultados.add(Text(resultadoOperaciones));
+      });
+
+      return;
+
+    }
+
+    else if(lista.length == 2){
+
+      if(lista[0] != "√"){
+        //Mal formada  
+        return;   
+      } 
+
+      res = sqrt(double.parse(lista[1]));
+
+      setState((){
+        resultadoOperaciones = "$operaciones = $res";
+        listaResultados.add(Text(resultadoOperaciones));
+        operaciones="$res";
+      });
+      
+      return;
+    }    
+
+    //Operaciones básicas
+    if(lista[1].trim() == "+"){
+       res = double.parse(lista[0]) + double.parse(lista[2]);
      
-     else if(pila[1].trim() == "/"){
-       res = double.parse(pila[0]) / double.parse(pila[2]);
-     }
+    }
      
-     setState((){
-       resultadoOperaciones = "$operaciones = $res";
-       listaResultados.add(Text(operaciones));
-       operaciones="$res";
-     });
+    else if(lista[1].trim() == "-"){
+       res = double.parse(lista[0]) - double.parse(lista[2]);
+    }
+     
+    else if(lista[1].trim() == "x"){
+       res = double.parse(lista[0]) * double.parse(lista[2]);
+    }
+     
+    else if(lista[1].trim() == "/"){
+       res = double.parse(lista[0]) / double.parse(lista[2]);
+    }
+     
+    setState((){
+      resultadoOperaciones = "$operaciones=$res";
+      listaResultados.add(Text(resultadoOperaciones));
+      operaciones="$res";
+    });
 
      //operaciones ="";
      
-     print("El resultado: $res");
-   }
+    print("El resultado: $res");
+  }
 }
