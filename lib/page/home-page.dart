@@ -10,7 +10,9 @@ class _HomePageState extends State<HomePage> {
   String operaciones = "";
   String resultadoOperaciones = "";
   String mensaje = "";
-
+  String expresion = "";
+  RegExp re = RegExp(
+      r'([+-]{2,})|([x\/]{2,})|([^0-9]\%)|(^[+-]{2,})|(^[\/x]+)|([0-9]\/0)');
   List<Text> listaResultados = [];
 
   var aux = 0.0;
@@ -70,7 +72,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   Column(mainAxisAlignment: MainAxisAlignment.end, children: [
                     Text(
-                      "Mensaje de error",
+                      mensaje,
                       style: TextStyle(
                         fontSize: 16.0,
                       ),
@@ -112,6 +114,7 @@ class _HomePageState extends State<HomePage> {
                     setState(() {
                       if (operaciones != "") {
                         operaciones += " / ";
+                        expresion += "/";
                       }
                     });
                   },
@@ -121,7 +124,7 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {
                     setState(() {
                       if (operaciones != "") {
-                        operaciones += " √ ";
+                        // operaciones += " √ ";
                       }
                     });
                   },
@@ -158,6 +161,7 @@ class _HomePageState extends State<HomePage> {
                     setState(() {
                       if (operaciones != "") {
                         operaciones += " x ";
+                        expresion += "x";
                       }
                     });
                   },
@@ -168,6 +172,7 @@ class _HomePageState extends State<HomePage> {
                     setState(() {
                       if (operaciones != "") {
                         operaciones += " % ";
+                        expresion += "%";
                       }
                     });
                   },
@@ -204,6 +209,7 @@ class _HomePageState extends State<HomePage> {
                     setState(() {
                       if (operaciones != "") {
                         operaciones += " - ";
+                        expresion += "-";
                       }
                     });
                   },
@@ -218,21 +224,21 @@ class _HomePageState extends State<HomePage> {
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      operaciones += "0";
-                    });
-                  },
-                  child: Text("0"),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
                       operaciones = "";
                     });
                   },
                   child: Text("C"),
                 ),
                 ElevatedButton(
-                  onPressed: CalcularOperaciones,
+                  onPressed: () {
+                    setState(() {
+                      operaciones += "0";
+                    });
+                  },
+                  child: Text("0"),
+                ),
+                ElevatedButton(
+                  onPressed: calcularOperaciones,
                   child: Text("="),
                 ),
                 ElevatedButton(
@@ -240,6 +246,7 @@ class _HomePageState extends State<HomePage> {
                     setState(() {
                       if (operaciones != "") {
                         operaciones += " + ";
+                        expresion += "+";
                       }
                     });
                   },
@@ -257,6 +264,25 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  validar(){
+     if (re.hasMatch()){
+      setState((){
+        mensaje="";
+      });
+
+      return;
+
+    }
+  }
+
+  calcularOperaciones() {
+    var lista = operaciones.trim().split(" ");
+    
+   
+    
+    var r = calcular(lista);
+  }
+
   bool esNumero(String str) {
     return (str == null) ? false : double.tryParse(str) != null;
   }
@@ -265,7 +291,7 @@ class _HomePageState extends State<HomePage> {
     print("Inicio*******");
     print("lista $lista");
 
-    var aux = 0.1;
+    var aux = 0.0;
     var a = "";
     var b = "";
     var operador = "";
@@ -279,11 +305,15 @@ class _HomePageState extends State<HomePage> {
       return 1 * calcular(lista);
     }
 
-    a = lista.first.trim();
-    lista.removeAt(0);
+    a = lista.removeAt(0).trim();
 
-    operador = lista.first.trim();
-    lista.removeAt(0);
+    if (a == "-") {
+      a = "-" + lista.removeAt(0).trim();
+    } else if (a == "+") {
+      a = lista.removeAt(0).trim();
+    }
+
+    operador = lista.removeAt(0).trim();
 
     print("Operador...$operador");
 
@@ -296,13 +326,20 @@ class _HomePageState extends State<HomePage> {
     
     lista.insert(0, "$a ");
     return calcular(lista);
-  }*/
+   }*/
 
-    if (operador == "(") {
+    /* if (operador == "(") {
       print("$a x $lista");
       aux = double.parse(a) * calcular(lista);
       lista.insert(0, "$aux ");
       print("(->Sub total: $aux ");
+    }*/
+
+    if (operador == "%") {
+      print("$a +  -> $lista");
+      aux = double.parse(a) / 100;
+      lista.insert(0, "$aux ");
+      print("+ -> Sub total: $aux ");
     }
 
     if (operador == "+") {
@@ -331,101 +368,24 @@ class _HomePageState extends State<HomePage> {
 
     if (operador == "/") {
       //Validar division por cero
-      b = lista.first.trim(); //Validar mayor que cero!!!
-      lista.removeAt(0);
+      b = lista.removeAt(0).trim(); //Validar mayor que cero!!!
       print("$a / $b -> $lista");
       aux = double.parse(a) / double.parse(b);
       lista.insert(0, "$aux");
       print("/ -> Sub total: $aux ");
     }
 
-    if (operador == ")") {
+    /*if (operador == ")") {
       print(") Es num $a -> $lista");
 
       return double.parse(a);
-    }
+    }*/
 
     return (lista.length > 2) ? calcular(lista) : aux;
   }
-
-  void CalcularOperaciones() {
-    var lista = operaciones.split(" ");
-
-    calcular(lista);
-    /*
-     var res = 0.0;
-     var malformacion = false;                      
-     var lista = operaciones.split(" ");
-
-     if(operaciones.trim() == ""){
-        return;
-     }
-     
-     
-     if(lista.length == 1){
-       
-       if(lista[0] == listaResultados.last.data){
-         return;
-       }
-
-       if(operaciones.trim() == "√"){
-       //Mal formada
-        return;
-     }
-
-      setState((){
-        resultadoOperaciones = "$operaciones";
-        listaResultados.add(Text(resultadoOperaciones));
-      });
-
-      return;
-
-    }
-
-    else if(lista.length == 2){
-
-      if(lista[0] != "√"){
-        //Mal formada  
-        return;   
-      } 
-
-      res = sqrt(double.parse(lista[1]));
-
-      setState((){
-        resultadoOperaciones = "$operaciones = $res";
-        listaResultados.add(Text(resultadoOperaciones));
-        operaciones="$res";
-      });
-      
-      return;
-    }    
-
-    //Operaciones básicas
-    if(lista[1].trim() == "+"){
-       res = double.parse(lista[0]) + double.parse(lista[2]);
-     
-    }
-     
-    else if(lista[1].trim() == "-"){
-       res = double.parse(lista[0]) - double.parse(lista[2]);
-    }
-     
-    else if(lista[1].trim() == "x"){
-       res = double.parse(lista[0]) * double.parse(lista[2]);
-    }
-     
-    else if(lista[1].trim() == "/"){
-       res = double.parse(lista[0]) / double.parse(lista[2]);
-    }
-     
-    setState((){
-      resultadoOperaciones = "$operaciones=$res";
-      listaResultados.add(Text(resultadoOperaciones));
-      operaciones="$res";
-    });
-
-     //operaciones ="";
-     
-    print("El resultado: $res");*/
+}
+aux;
   }
+
+  
 }
