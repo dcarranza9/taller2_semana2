@@ -13,7 +13,7 @@ class _HomePageState extends State<HomePage> {
   String expresion = "";
   RegExp re = RegExp(
       r'([+-]{2,})|([x\/]{2,})|([^0-9]\%)|(^[+-]{2,})|(^[\/x]+)|([0-9]\/0)');
-  List<Text> listaResultados = [];
+  List<Widget> listaResultados = [];
 
   var aux = 0.0;
   @override
@@ -61,10 +61,12 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           Padding(
                             padding: const EdgeInsets.all(12.0),
-                            child: Text(operaciones,
-                                style: TextStyle(
-                                  fontSize: 14.0,
-                                )),
+                            child: Text(
+                              operaciones,
+                              style: TextStyle(
+                                fontSize: 14.0,
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -89,15 +91,20 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {
                     setState(() {
                       operaciones += "7";
+                      expresion += "7";
                     });
                   },
                   child: Text("7"),
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    setState(() {
-                      operaciones += "8";
-                    });
+                    expresion += "8";
+
+                    if (validar()) {
+                      setState(() {
+                        operaciones += "8";
+                      });
+                    }
                   },
                   child: Text("8"),
                 ),
@@ -105,6 +112,7 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {
                     setState(() {
                       operaciones += "9";
+                      expresion += "9";
                     });
                   },
                   child: Text("9"),
@@ -136,6 +144,7 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {
                     setState(() {
                       operaciones += "4";
+                      expresion += "4";
                     });
                   },
                   child: Text("4"),
@@ -144,6 +153,7 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {
                     setState(() {
                       operaciones += "5";
+                      expresion += "5";
                     });
                   },
                   child: Text("5"),
@@ -152,6 +162,7 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {
                     setState(() {
                       operaciones += "6";
+                      expresion += "6";
                     });
                   },
                   child: Text("6"),
@@ -225,6 +236,7 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {
                     setState(() {
                       operaciones = "";
+                      expresion += "";
                     });
                   },
                   child: Text("C"),
@@ -233,6 +245,7 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {
                     setState(() {
                       operaciones += "0";
+                      expresion += "0";
                     });
                   },
                   child: Text("0"),
@@ -264,22 +277,33 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  validar(){
-     if (re.hasMatch()){
-      setState((){
-        mensaje="";
+  validar() {
+    var badExp = re.hasMatch(expresion);
+
+    setState(() {
+      mensaje = "";
+    });
+
+    if (badExp) {
+      expresion = (expresion.length > 0)
+          ? expresion.substring(0, expresion.length - 1)
+          : "";
+      setState(() {
+        mensaje = "Expresión mal formada!";
       });
-
-      return;
-
     }
+
+    return !badExp;
   }
 
   calcularOperaciones() {
     var lista = operaciones.trim().split(" ");
-    
-   
-    
+
+    if (lista.length < 3) {
+      if (!esNumero(lista.first.trim()) &&
+          esNumero(lista.elementAt(1).trim())) {}
+    }
+
     var r = calcular(lista);
   }
 
@@ -300,10 +324,10 @@ class _HomePageState extends State<HomePage> {
       return double.parse(lista.first.trim());
     }
 
-    if (lista.first.trim() == "(" || lista.first.trim() == "") {
-      lista.removeAt(0);
-      return 1 * calcular(lista);
-    }
+    // if (lista.first.trim() == "(" || lista.first.trim() == "") {
+    //   lista.removeAt(0);
+    //   return 1 * calcular(lista);
+    // }
 
     a = lista.removeAt(0).trim();
 
@@ -383,9 +407,4 @@ class _HomePageState extends State<HomePage> {
 
     return (lista.length > 2) ? calcular(lista) : aux;
   }
-}
-aux;
-  }
-
-  
 }
