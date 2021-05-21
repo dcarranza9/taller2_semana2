@@ -12,8 +12,8 @@ class _HomePageState extends State<HomePage> {
   String mensaje = "";
   String expresion = "";
   RegExp re = RegExp(
-      r'([+-]{2,})|([x\/]{2,})|([^0-9]\%)|(^[+-]{2,})|(^[\/x]+)|([0-9]\/0)');
-  List<Widget> listaResultados = [];
+      r'/([+-]{2,})|([x\/]{2,})|([^0-9]\%)|(^[+-]{2,})|(^[\/x%]+)|([0-9]\/0)|([^0-9\%][\/x])/gm');
+  List<Text> listaResultados = [];
 
   var aux = 0.0;
   @override
@@ -33,13 +33,16 @@ class _HomePageState extends State<HomePage> {
             color: Colors.red,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: listaResultados,
-                )
-              ]),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: listaResultados,
+                  )
+                ],
+              ),
             ),
           ),
         ),
@@ -64,7 +67,7 @@ class _HomePageState extends State<HomePage> {
                             child: Text(
                               operaciones,
                               style: TextStyle(
-                                fontSize: 14.0,
+                                fontSize: 20.0,
                               ),
                             ),
                           ),
@@ -88,52 +91,34 @@ class _HomePageState extends State<HomePage> {
             children: [
               Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
                 ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      operaciones += "7";
-                      expresion += "7";
-                    });
-                  },
                   child: Text("7"),
+                  onPressed: () => validar("7"),
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    expresion += "8";
-
-                    if (validar()) {
-                      setState(() {
-                        operaciones += "8";
-                      });
-                    }
-                  },
                   child: Text("8"),
+                  onPressed: () => validar("8"),
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      operaciones += "9";
-                      expresion += "9";
-                    });
-                  },
                   child: Text("9"),
+                  onPressed: () => validar("9"),
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      if (operaciones != "") {
-                        operaciones += " / ";
-                        expresion += "/";
-                      }
-                    });
-                  },
                   child: Text("/"),
+                  onPressed: () => validar(" / "),
                 ),
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      if (operaciones != "") {
-                        // operaciones += " √ ";
+                      double res = 0;
+
+                      try {
+                        res = calcular(operaciones.trim().split(" "));
+                        res = sqrt(res);
+                      } catch (exception) {
+                        res = 0;
                       }
+
+                      addResultado(res.toString());
                     });
                   },
                   child: Text("√"),
@@ -141,135 +126,93 @@ class _HomePageState extends State<HomePage> {
               ]),
               Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
                 ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      operaciones += "4";
-                      expresion += "4";
-                    });
-                  },
                   child: Text("4"),
+                  onPressed: () => validar("4"),
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      operaciones += "5";
-                      expresion += "5";
-                    });
-                  },
                   child: Text("5"),
+                  onPressed: () => validar("5"),
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      operaciones += "6";
-                      expresion += "6";
-                    });
-                  },
                   child: Text("6"),
+                  onPressed: () => validar("6"),
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      if (operaciones != "") {
-                        operaciones += " x ";
-                        expresion += "x";
-                      }
-                    });
-                  },
                   child: Text("x"),
+                  onPressed: () => validar(" x "),
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      if (operaciones != "") {
-                        operaciones += " % ";
-                        expresion += "%";
-                      }
-                    });
-                  },
                   child: Text("%"),
+                  onPressed: () => validar(" % "),
                 ),
               ]),
               Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
                 ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      operaciones += "1";
-                    });
-                  },
                   child: Text("1"),
+                  onPressed: () => validar("2"),
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      operaciones += "2";
-                    });
-                  },
                   child: Text("2"),
+                  onPressed: () => validar("2"),
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      operaciones += "3";
-                    });
-                  },
                   child: Text("3"),
+                  onPressed: () => validar("3"),
+                ),
+                ElevatedButton(
+                  child: Text("-"),
+                  onPressed: () => validar(" - "),
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    setState(() {
-                      if (operaciones != "") {
-                        operaciones += " - ";
-                        expresion += "-";
-                      }
-                    });
+                    double res = 0;
+
+                    try {
+                      res = calcular(operaciones.trim().split(" "));
+                      res = pow(res, 2);
+                    } catch (exception) {
+                      res = 0;
+                    }
+
+                    addResultado(res.toString());
                   },
-                  child: Text("-"),
-                ),
-                ElevatedButton(
-                  onPressed: () {},
                   child: Text("x²"),
                 ),
               ]),
-              Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      operaciones = "";
-                      expresion += "";
-                    });
-                  },
-                  child: Text("C"),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      operaciones += "0";
-                      expresion += "0";
-                    });
-                  },
-                  child: Text("0"),
-                ),
-                ElevatedButton(
-                  onPressed: calcularOperaciones,
-                  child: Text("="),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      if (operaciones != "") {
-                        operaciones += " + ";
-                        expresion += "+";
-                      }
-                    });
-                  },
-                  child: Text("+"),
-                ),
-                ElevatedButton(
-                  onPressed: () {},
-                  child: Text(" "),
-                ),
-              ])
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  ElevatedButton(
+                    child: Text("C"),
+                    onPressed: () {
+                      setState(() {
+                        if (operaciones == "") {
+                          listaResultados = [];
+                        }
+                        operaciones = "";
+                        expresion = "";
+                        mensaje = "";
+                      });
+                    },
+                  ),
+                  ElevatedButton(
+                    child: Text("0"),
+                    onPressed: () => validar("0"),
+                  ),
+                  ElevatedButton(
+                    onPressed: calcularOperaciones,
+                    child: Text("="),
+                  ),
+                  ElevatedButton(
+                    child: Text("+"),
+                    onPressed: () => validar(" + "),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {},
+                    child: Text(" "),
+                  ),
+                ],
+              )
             ],
           ),
         ),
@@ -277,17 +220,16 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  validar() {
-    var badExp = re.hasMatch(expresion);
-
+  validar([String str = ""]) {
     setState(() {
       mensaje = "";
+      operaciones += str;
+      expresion += str.trim();
     });
 
+    var badExp = re.hasMatch(expresion);
+
     if (badExp) {
-      expresion = (expresion.length > 0)
-          ? expresion.substring(0, expresion.length - 1)
-          : "";
       setState(() {
         mensaje = "Expresión mal formada!";
       });
@@ -298,13 +240,71 @@ class _HomePageState extends State<HomePage> {
 
   calcularOperaciones() {
     var lista = operaciones.trim().split(" ");
+    var r;
 
-    if (lista.length < 3) {
-      if (!esNumero(lista.first.trim()) &&
-          esNumero(lista.elementAt(1).trim())) {}
+    if (!validar() || lista.isEmpty) {
+      return;
     }
 
-    var r = calcular(lista);
+    if (lista.length < 2) {
+      if (!esNumero(lista.first.trim())) {
+        setState(() {
+          mensaje = "Expresión mal formada!";
+        });
+      } else if (listaResultados.last.data != lista.first.trim()) {
+        setState(() {
+          listaResultados.add(Text(lista.first.trim()));
+        });
+      }
+
+      return;
+    }
+
+    if (lista.length < 3) {
+      if (!esNumero(lista.first.trim()) && esNumero(lista.last.trim()))
+        r = double.parse(lista.first.trim() + lista.last.trim());
+      else if (esNumero(lista.first.trim()) && lista.last.trim() == "%")
+        r = double.parse(lista.first.trim()) / 100;
+      else {
+        setState(() {
+          mensaje = "Expresión mal formada!";
+        });
+
+        return;
+      }
+
+      addResultado(r.toString());
+
+      return;
+    }
+
+    r = calcular(lista);
+
+    addResultado(r.toString());
+  }
+
+  addResultado(String res) {
+    if (listaResultados.isEmpty) {
+      setState(() {
+        listaResultados.add(Text(
+          res.toString(),
+          style: TextStyle(
+            fontSize: 20.0,
+          ),
+        ));
+      });
+      return;
+    }
+    if (listaResultados.last.data != res.trim()) {
+      setState(() {
+        listaResultados.add(Text(
+          res.toString(),
+          style: TextStyle(
+            fontSize: 20.0,
+          ),
+        ));
+      });
+    }
   }
 
   bool esNumero(String str) {
@@ -321,7 +321,14 @@ class _HomePageState extends State<HomePage> {
     var operador = "";
 
     if (lista.length < 3) {
-      return double.parse(lista.first.trim());
+      if (esNumero(lista.first) && lista.last.trim() == '%') {
+        aux = double.parse(lista.first.trim()) / 100;
+      } else if (["+", "-"].contains(lista.first.trim()) &&
+          esNumero(lista.last.trim())) {
+        aux = double.parse(lista.first.trim() + lista.last.trim());
+      }
+      lista.clear();
+      return aux;
     }
 
     // if (lista.first.trim() == "(" || lista.first.trim() == "") {
@@ -404,7 +411,7 @@ class _HomePageState extends State<HomePage> {
 
       return double.parse(a);
     }*/
-
+    print("lista-> $lista");
     return (lista.length > 2) ? calcular(lista) : aux;
   }
 }
